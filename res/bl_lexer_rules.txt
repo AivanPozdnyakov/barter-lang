@@ -1,0 +1,55 @@
+start: function+
+?expr: cond
+
+?cond: sum 
+    | cond "<" sum -> lt
+    | cond "<=" sum -> le
+    | cond ">" sum -> bt
+    | cond ">=" sum -> be
+    | cond "==" sum -> eq
+    | cond "!=" sum -> neq
+
+?sum: product
+    | sum "+" product   -> add
+    | sum "-" product   -> sub
+
+?product: atom
+    | product "*" atom  -> mul
+    | product "/" atom  -> div
+
+?atom: NUMBER           -> number
+     | "-" atom         -> unary_minus
+     | "!" atom         -> neg
+     | NAME             -> var
+     | "(" sum ")"
+     | function_call
+
+function_call: NAME "(" (expr ("," expr )*)? ")"
+
+type: "int" -> int
+dec_param: type NAME
+dec_params: dec_param ("," dec_param )*
+body: "{" statement* "}"
+return: "return" expr
+assigment: NAME "=" expr
+declare_variable: type NAME "=" expr
+?statement: ((return | expr | declare_variable | assigment) ";")
+          | if | while
+
+if: "if" expr body 
+while: "while" expr body
+
+return_type: type
+            | "none" -> none 
+function: "func" NAME "(" dec_params? ")" "->" return_type body
+
+
+COMMENT: /\/\/.*/
+%import common.CNAME -> NAME
+%import common.NUMBER
+%import common.WS_INLINE
+%import common.WORD  
+%import common.SIGNED_NUMBER
+%import common.WS
+%ignore WS
+%ignore COMMENT
