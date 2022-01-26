@@ -24,24 +24,30 @@ start: function+
      | "(" sum ")"
      | function_call
 
-function_call: NAME "(" (expr ("," expr )*)? ")"
+params: (expr ("," expr )*)?
+function_call: NAME "(" params ")"
 
 type: "int" -> int
 dec_param: type NAME
 dec_params: dec_param ("," dec_param )*
-body: "{" statement* "}"
+end: "}"
+body: "{" statement* end
 return: "return" expr
 assigment: NAME "=" expr
 declare_variable: type NAME "=" expr
-?statement: ((return | expr | declare_variable | assigment) ";")
+expression: expr
+?statement: ((return | expression | declare_variable | assigment) ";")
           | if | while
 
-if: "if" expr body 
-while: "while" expr body
+_block: "{" statement* "}"
+if: "if" expr _block
+while: "while" expr _block
 
 return_type: type
-            | "none" -> none 
-function: "func" NAME "(" dec_params? ")" "->" return_type body
+            | "none" -> none
+
+function_name: NAME
+function: "func" function_name "(" dec_params? ")" "->" return_type _block
 
 
 COMMENT: /\/\/.*/
