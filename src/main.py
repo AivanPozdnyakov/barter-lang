@@ -1,21 +1,9 @@
-from collections import defaultdict
-
 from lark import Lark, Tree, Token
 
-from fake_backend import parse_function, result
+from fake_backend import parse_function
+from llvm.brand_compiler import generate_llvm
+from llvm_backend import parse_function, ctx
 
-
-# class MyTransformer(Transformer):
-#     def function(self, items):
-#         function_name, params, return_type, body = items
-#         return {"function_name": function_name, "params": params,
-#                 "return_type": return_type}
-#
-#     def function_name(self, items: list[Token]) -> str:
-#         return items[0].value
-#
-#     def return_type(self, items):
-#         return items[0].data
 
 def transform(tree):
     if type(tree.data) == Token:
@@ -29,7 +17,7 @@ def transform(tree):
             children = child.children
             # if tree.data == "body":
             #     print("hey", tree.children)
-            if child.data == "params":
+            if child.data in ("params", "dec_params"):
                 tree.children[i] = (child.data, children)
                 continue
             if len(children) == 1:
@@ -37,12 +25,12 @@ def transform(tree):
             tree.children[i] = (child.data, children) if len(children) else child.data
             # else:
 
+
 def main() -> None:
     with open("../res/bl_lexer_rules.txt", "r") as f:
         parser = Lark(f.read(), parser='lalr')
     with open("../res/examples/fib.barter", "r") as f:
         r = parser.parse(f.read())
-    # r = MyTransformer().transform(r)
     transform(r)
     r = r.children
     # print(r.pretty())
@@ -52,8 +40,7 @@ def main() -> None:
             parse_function(data)
         else:
             assert 0, f"Unhandled tag {tag}"
-    print("\n".join(result))
-        # print(as_dict(function))
+    print(generate_llvm(ctx))
 
 
 if __name__ == '__main__':

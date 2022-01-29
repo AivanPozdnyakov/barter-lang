@@ -27,9 +27,9 @@ start: function+
 params: (expr ("," expr )*)?
 function_call: NAME "(" params ")"
 
-type: "int" -> int
+type: "int" -> i32
 dec_param: type NAME
-dec_params: dec_param ("," dec_param )*
+dec_params: (dec_param ("," dec_param )*)?
 end: "}"
 body: "{" statement* end
 return: "return" expr
@@ -43,11 +43,10 @@ _block: "{" statement* "}"
 if: "if" expr _block
 while: "while" expr _block
 
-return_type: type
+?return_type: type
             | "none" -> none
 
-function_name: NAME
-function: "func" function_name "(" dec_params? ")" "->" return_type _block
+function: "func" NAME "(" dec_params ")" "->" return_type _block
 
 
 COMMENT: /\/\/.*/
