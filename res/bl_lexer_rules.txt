@@ -1,5 +1,9 @@
 start: function+
-?expr: cond
+?expr: log
+
+?log: cond
+    | log "and" cond -> and
+    | log "or" cond -> or
 
 ?cond: sum 
     | cond "<" sum -> lt
@@ -16,27 +20,38 @@ start: function+
 ?product: atom
     | product "*" atom  -> mul
     | product "/" atom  -> div
+    | product "%" atom  -> rem
+
+boolean: "true" -> true
+       | "false" -> false
 
 ?atom: NUMBER           -> number
      | "-" atom         -> unary_minus
      | "!" atom         -> neg
      | NAME             -> var
+     | boolean          -> boolean
      | "(" sum ")"
+     | system_call
      | function_call
 
 params: (expr ("," expr )*)?
 function_call: NAME "(" params ")"
 
+system_call: "@" NAME "(" params ")"
+
 type: "int" -> i32
+    | "bool" -> i8
+    | "float" -> f32
 dec_param: type NAME
 dec_params: (dec_param ("," dec_param )*)?
 end: "}"
 body: "{" statement* end
+return_void: "return"
 return: "return" expr
 assigment: NAME "=" expr
 declare_variable: type NAME "=" expr
 expression: expr
-?statement: ((return | expression | declare_variable | assigment) ";")
+?statement: ((return | return_void | expression | declare_variable | assigment) ";")
           | if | while
 
 _block: "{" statement* "}"
@@ -44,7 +59,7 @@ if: "if" expr _block
 while: "while" expr _block
 
 ?return_type: type
-            | "none" -> none
+            | "void" -> void
 
 function: "func" NAME "(" dec_params ")" "->" return_type _block
 

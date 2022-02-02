@@ -1,0 +1,15 @@
+func fib(int x) -> int {
+    if x < 2 {
+        return 1;
+    }
+    return fib(x - 1) + fib(x - 2);
+}
+
+func main() -> int{
+    @putd(fib(30));  // expected 1346269
+    // python to check
+    // fib = lambda x: 1 if x < 2 else fib(x-1) + fib(x-2)
+
+    // fib(40) = 165580141
+    return 0;
+}

@@ -1,0 +1,14 @@
+macro swap(a, b){
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+func main() -> void {
+    int a = 5;
+    int b = 10;
+    #swap(a,b);
+    putd(a);
+    putd(b);
+    //expecting 10, 5
+}

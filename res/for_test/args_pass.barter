@@ -1,0 +1,10 @@
+func print(int a, int b) -> void {
+    @putd(a);
+    @putd(b);
+    return;
+}
+
+func main() -> int{
+    print(15, 1);
+    return 0;
+}

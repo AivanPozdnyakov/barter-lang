@@ -1,0 +1,16 @@
+func neg(bool flag) -> bool {
+    return !flag;
+}
+func main() -> int {
+    int i = 32;
+    bool f = true;
+    bool f2 = false;
+    bool f3 = 1 < i;
+    if f and neg(false) {
+        if neg(true) or f3 {
+            @putd(1);
+        }
+        @putd(0);
+    }
+    return 0;
+}

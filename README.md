@@ -1,9 +1,20 @@
 # barter-lang
 
 ## TODO
-1. return is now only available in the end of the function
-2. ret void
-3. ptr instructions 
-4. test basic functions
-5. printf int
-6. different types
+
+- return
+    - add auto return in void
+    - return in the middle of the function
+    - enforce return, handle error if not returned
+    -[X] fix return issue
+    -[X] ret void
+  
+- ptr instructions
+-[X] putd
+- system function with @
+-[X] i32, bool, float
+-[X] add unary -, !, bool binary operations
+- add bitcast
+- test basic instructions
+- run separate test only
+- why not compiling from cmd?

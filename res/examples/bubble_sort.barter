@@ -1,0 +1,35 @@
+macro swap(a, b){
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+func bubble_sort(*int arr, int n) -> void {
+    int i = 0;
+    int j = 0;
+    while i < n - 1 {
+    // Last i elements are already in place
+        while j < n - i - 1 {
+            if arr[j] > arr[j + 1]) {
+                swap(arr[j], arr[j + 1]);
+            }
+        }
+        i = i + 1;
+    }
+}
+
+func print_array(*int arr, int size){
+    int i = 0;
+    while i < size {
+        putd(arr[i]);
+        putc(" ");
+    }
+    putc("\n");
+}
+
+func main() -> void {
+    *int arr = @array(1, 4, -2, -3, -1, 2, 3, -5, -4, 0);
+    bubble_sort(arr, 10);
+    print_array(arr, 10);
+    //-5 -4 -3 -2 -1 0 1 2 3 4 \n
+}

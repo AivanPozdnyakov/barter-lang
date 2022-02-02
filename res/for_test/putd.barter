@@ -1,0 +1,6 @@
+func main() -> int {
+    @putd(1);
+    @putd(-1);
+    @putd(100);
+    return 0;
+}
