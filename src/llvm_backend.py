@@ -1,6 +1,7 @@
 from llvm.basic_instructions import *  # push_number
 from llvm.control_flow_instructions import *
-from llvm.struct import LLVM, FunctionSignature
+from llvm.struct import LLVM, FunctionSignature, VAR, GENERIC_TYPE, NUMBER
+from src.llvm.ptr_instructions import deref_ptr_and_push, shift, assign_ptr, create_array_and_push
 
 
 def parse_importc(ctx: Context, data) -> None:
@@ -64,7 +65,7 @@ def parse_block(ctx: Context, body):
 def parse_if(ctx: Context, data):
     expr, block = data[0], data[1:]
     expr_type = parse_expr(ctx, expr)
-    assert expr_type == LLVM.bool
+    assert expr_type == LLVM.bool, expr_type
     llvm_branch(ctx)
     parse_block(ctx, block)
     llvm_branch_end(ctx)
@@ -94,12 +95,77 @@ def infer_type(_ctx: Context, tag: str, type_0: LLVM.type, type_1: LLVM.type) ->
     if tag in ("sub", "add", "mul", "div", "rem"):
         assert type_0 == type_1 == LLVM.int
         return LLVM.int
-    if tag in ("lt", "be", "eq", "bt", "neq"):
+    if tag in ("lt", "le", "bt", "be", "eq", "neq"):
         assert type_0 == LLVM.int and type_1 == LLVM.int
         return LLVM.bool
     # if tag in ("sub", "add", "mul"):
     #     assert type_0 in number_type and type_1 in number_type
     #     return LLVM.float if LLVM.float in (type_0, type_1) else LLVM.int
+
+
+def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
+    _, params_data = params
+    if function_name == "putd":
+        assert len(params_data) == 1
+        expr_type = parse_expr(ctx, params_data[0])
+        assert expr_type == LLVM.int  # or expr_type == LLVM.bool
+        llvm_putd(ctx)
+        return LLVM.void
+    if function_name == "shift":
+        assert len(params_data) == 2
+        ptr_expression, ident_value = params_data
+        ptr_type = parse_expr(ctx, ptr_expression)
+        ident_type = parse_expr(ctx, ident_value)
+        assert is_pointer(ptr_type) and ident_type == LLVM.int
+        shift(ctx)
+        return ptr_type
+    if function_name == "deref":
+        assert len(params_data) == 1
+        expr_type = parse_expr(ctx, params_data[0])
+        assert is_pointer(expr_type)
+        deref_ptr_and_push(ctx)
+        return expr_type[:-1]
+    if function_name == "addr":
+        assert len(params_data) == 1
+        tag, data = params_data[0]
+        assert tag == VAR, (tag, data)
+        ctx.parameters.append(f"%{data}")
+        return ctx.variables[data] + "*"
+        # assert 0
+        # expr_type = parse_expr(ctx, params_data[0])
+        # assert expr_type == LLVM.int  # or expr_type == LLVM.bool
+    if function_name == "as_p":
+        assert len(params_data) == 2
+        ptr_expression, assign_value = params_data
+        ptr_type = parse_expr(ctx, ptr_expression)
+        assign_type = parse_expr(ctx, assign_value)
+        assert is_pointer(ptr_type) and assign_type == ptr_type[:-1], (ptr_type, assign_type)
+        assign_ptr(ctx)
+        return LLVM.void
+    if function_name == "array_from":
+        create_array_and_push(ctx, LLVM.int, len(params_data))  # ptr ptr + 1
+        llvm_duplicate(ctx)
+        for param in params_data:
+            tag, data = param
+            if tag == "unary_minus":
+                tag = NUMBER
+                data = "-" + data[1]
+            assert tag == NUMBER, param
+            llvm_duplicate(ctx)
+            llvm_push_number(ctx, data)
+            assign_ptr(ctx)
+            llvm_push_number(ctx, 1)
+            shift(ctx)
+        llvm_pop(ctx)
+        return LLVM.ptr_int
+    if function_name == "array":
+        assert len(params_data) == 2
+        array_type_data, size = params_data
+        assert array_type_data[0] == GENERIC_TYPE, array_type_data
+        assert size[0] == "number"
+        create_array_and_push(ctx, array_type_data[1], size[1])
+        return array_type_data[1] + "*"
+    assert 0, f"unknown system function {function_name}"
 
 
 def parse_expr(ctx: Context, data) -> LLVM.type:
@@ -156,15 +222,7 @@ def parse_expr(ctx: Context, data) -> LLVM.type:
         return LLVM.bool
     if tag == "system_call":
         function_name, params = data
-        _, params_data = params
-        if function_name == "putd":
-            assert len(params_data) == 1
-            expr_type = parse_expr(ctx, params_data[0])
-            assert expr_type == LLVM.int #or expr_type == LLVM.bool
-            llvm_putd(ctx)
-            return LLVM.void
-        else:
-            assert 0, f"unknown system function {function_name}"
+        return llvm_system_call(ctx, function_name, params)
     assert 0, f"unknown tag {tag}"
 
 

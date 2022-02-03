@@ -8,6 +8,9 @@ def check_variable_name(variable_name: str):
     pass
 
 
+def is_pointer(s: str) -> bool:
+    return s.endswith("*")
+
 specials = {"return", "if", "while", "macro", "func", "for", "else", "elseif", "end",
             "int", "i32", "float", "double", "f32", "bool",
             "true", "false"}

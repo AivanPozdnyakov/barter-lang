@@ -1,0 +1,16 @@
+func swap(*int a, *int b) -> void {
+    int temp = @deref(a);
+    @as_p(a, @deref(b));
+    @as_p(b, temp);
+    return;
+}
+
+func main() -> int {
+    int a = 5;
+    int b = 10;
+    swap(@addr(a), @addr(b));
+    @putd(a);
+    @putd(b);
+    return 0;
+    //expecting 10, 5
+}

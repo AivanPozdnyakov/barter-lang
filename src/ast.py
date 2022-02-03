@@ -12,12 +12,14 @@ def transform(tree):
         if type(child) == Tree:
             transform(child)
             children = child.children
-            if child.data in ("params", "dec_params", "macro_params", "importc_params"):
+            if child.data in ("params", "dec_params", "macro_params", "importc_params", "system_call_params"):
                 tree.children[i] = (child.data, children)
                 continue
             if len(children) == 1:
                 children = child.children[0]
             tree.children[i] = (child.data, children) if len(children) else child.data
+            if type(tree.children[i]) == str and tree.children[i].startswith("ptr_"):
+                tree.children[i] = tree.children[i].replace("ptr_", "") + "*"
             # else:
 
 # "../res/examples/fib.barter"

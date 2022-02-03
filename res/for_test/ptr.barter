@@ -1,0 +1,17 @@
+func main() -> int {
+    int x0 = 10;
+    int x = 11;
+    int x1 = 12;
+    *int ptr  = @addr(x);
+    @putd(@deref(ptr));
+    ptr = @addr(x1);
+    @putd(@deref(ptr));
+    *int ptr1  = @addr(x);
+    ptr1 = @shift(ptr1, 1);
+    @putd(@deref(ptr1));
+    @putd(@deref(@shift(ptr1, -2)));
+    @as_p(ptr1, 69);
+    @putd(x0);
+    // 11 12 10 12 69
+    return 0;
+}

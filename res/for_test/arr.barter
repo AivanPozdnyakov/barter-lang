@@ -1,0 +1,17 @@
+func main() -> int {
+    *int ptr = @array(int, 5);
+    *int ptr1 = ptr;
+    int ind = 0;
+    while ind < 5 {
+        @as_p(ptr1, ind + 10);
+        ptr1 = @shift(ptr1, 1);
+        ind = ind + 1;
+    }
+    ind = 0;
+    while ind < 5 {
+        @putd(@deref(@shift(ptr, ind)));
+        ind = ind + 1;
+    }
+    // 10 11 12 13 14
+    return 0;
+}

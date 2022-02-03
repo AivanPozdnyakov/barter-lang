@@ -1,9 +1,14 @@
 from dataclasses import dataclass, field
-from typing import Literal
+from typing import Literal, Union
 
 
 class LlvmClass:
-    type = Literal['i32', 'i8', 'f32', 'void']
+    type = Literal['i32', 'i8', 'f32', 'void',
+                   '*i32', '*i8', '*f32']
+
+    def is_type(self, value) -> bool:
+        return value in ['i32', 'i8', 'f32', 'void',
+                         '*i32', '*i8', '*f32']
 
     @property
     def int(self) -> str:
@@ -21,13 +26,36 @@ class LlvmClass:
     def void(self):
         return "void"
 
+    @property
+    def ptr_int(self) -> str:
+        return "i32*"
+
+    @property
+    def ptr_float(self):
+        return "f32*"
+
+    @property
+    def ptr_bool(self):
+        return "i8*"
+
 
 LLVM = LlvmClass()
+
+NUMBER = 'number'
+VAR = 'var'
+GENERIC_TYPE = 'generic_type'
+CONST_EXPR = Literal[NUMBER, VAR]
 
 
 @dataclass
 class FunctionSignature:
     parameters: list[LLVM.type]
+    return_type: LLVM.type
+
+
+@dataclass
+class SysSignature:
+    parameters: list[Union[LLVM.type, CONST_EXPR]]
     return_type: LLVM.type
 
 
@@ -40,6 +68,7 @@ class Context:
     listing: list[str] = field(default_factory=list)
     parameters: list[str] = field(default_factory=list)
     signatures: dict[str, FunctionSignature] = field(default_factory=dict)
+    # sys_signatures: dict[str, SysSignature] = field(default_factory=dict)
     register_counter = 0
     branch_temp_indexes: list[int] = field(default_factory=list)
     loop_temp_indexes: list[int] = field(default_factory=list)

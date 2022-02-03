@@ -27,7 +27,7 @@ def llvm_push_number(ctx: Context, number: int) -> None:
 
 def llvm_apply_binary_operation(ctx: Context, operation_type: str) -> None:
     arithmetic_operations = {"add": "add", "sub": "sub", "mul": "mul", "div": "sdiv", "rem": "srem"}
-    logical_operations = {"lt": "slt", "le": "sle", "be": "sge", "bt": "sgt", "eq": "eq", "neq": "ne"}
+    logical_operations = {"lt": "slt", "le": "sle", "bt": "sgt", "be": "sge", "eq": "eq", "neq": "ne"}
     params = ctx.parameters[-2:]
     assert len(params) == 2, (operation_type, ctx.parameters)
     parameters_as_str = ",".join(params)
@@ -51,7 +51,7 @@ def llvm_apply_binary_operation(ctx: Context, operation_type: str) -> None:
 def llvm_call_function(ctx: Context, function_name: str) -> None:
     signature = ctx.signatures.get(function_name)
     parameters = []
-    for i, typeof in enumerate(signature.parameters):
+    for i, typeof in enumerate(reversed(signature.parameters)):
         param = ctx.parameters.pop()
         parameters.append(f"{typeof} {param}")
     parameters_as_str = ",".join(reversed(parameters))

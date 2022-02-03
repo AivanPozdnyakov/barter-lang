@@ -1,21 +1,31 @@
+func putb(bool f) -> void {
+    if f {
+        @putd(1);
+        return;
+    }
+    @putd(0);
+    return;
+}
+
+
 func main() -> int {
-    @putd(1<3);
-    @putd(3<3);
-    @putd(4<3);
+    putb(1<3);
+    putb(3<3);
+    putb(4<3);
 
-    @putd(1<=3);
-    @putd(3<=3);
-    @putd(4<=3);
+    putb(1<=3);
+    putb(3<=3);
+    putb(4<=3);
 
-    @putd(1>=3);
-    @putd(3>=3);
-    @putd(4>=3);
+    putb(1>=3);
+    putb(3>=3);
+    putb(4>=3);
 
-    @putd(1==1);
-    @putd(1==2);
+    putb(1==1);
+    putb(1==2);
 
-    @putd(1!=1);
-    @putd(1!=2);
-    // 1 0 0  1 1 0  0 1 1  1 0  1 0
+    putb(1!=1);
+    putb(1!=2);
+    // 1 0 0  1 1 0  0 1 1  1 0  0 1
     return 0;
 }

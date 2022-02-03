@@ -30,7 +30,7 @@ boolean: "true" -> true
      | "!" atom         -> neg
      | NAME             -> var
      | boolean          -> boolean
-     | "(" sum ")"
+     | "(" log ")"
      | system_call
      | macro_call
      | function_call
@@ -39,14 +39,20 @@ params: (expr ("," expr )*)?
 
 function_call: NAME "(" params ")"
 
-system_call: "@" NAME "(" params ")"
+generic_type: type
+?system_call_param: generic_type | expr
+system_call_params: (system_call_param ("," system_call_param )*)?
+system_call: "@" NAME "(" system_call_params ")"
 
 macro_call: "#" NAME "(" params ")"
-
 
 type: "int" -> i32
     | "bool" -> i8
     | "float" -> f32
+    | "*int" -> ptr_i32
+    | "*bool" -> ptr_i8
+    | "*float" -> ptr_f32
+
 end: "}"
 body: "{" statement* end
 return_void: "return"
