@@ -1,0 +1,16 @@
+func main() -> int {
+    @putd(true and false);
+    @putd(false and true);
+    @putd(true and true);
+    @putd(false and false);
+
+    @putd(true or false);
+    @putd(false or true);
+    @putd(true or true);
+    @putd(false or false);
+
+    @putd(!true);
+    @putd(!false);
+    // 0 0 1 0  1 1 1 0  0 1
+    return 0;
+}

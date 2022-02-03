@@ -1,0 +1,8 @@
+importc putchar(int) -> int
+
+func main() -> int {
+    putchar(65);
+    putchar(66);
+    // AB
+    return 0;
+}

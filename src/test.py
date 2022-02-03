@@ -1,3 +1,4 @@
+import os
 import subprocess
 import time
 
@@ -11,9 +12,9 @@ from src.llvm_backend import parse_ast
 
 
 def build_ctx() -> Context:
-    putchar_signature = FunctionSignature([LLVM.int], LLVM.void)
-    signatures = {"putchar": putchar_signature}
-    ctx = Context(signatures=signatures)
+    # putchar_signature = FunctionSignature([LLVM.int], LLVM.void)
+    # signatures = {"putchar": putchar_signature}
+    ctx = Context()
     return ctx
 
 
@@ -50,7 +51,8 @@ test_cases = {
     "loop": "012345",
     "args_pass": "151",
     "gcd": "55",
-    "int_operations": "4 -2 0 7 1 2 -1 6 0 9 1 30".replace(" ", "")
+    "int_arithmetic_operations": "4 -2 0 7 1 2 -1 6 0 9 1 30".replace(" ", ""),
+    "importc_putchar": "AB",
 }
 
 
@@ -61,6 +63,12 @@ def test_all():
             ast = build_ast_from_file(f_res(f"for_test/{key}.barter"))
             parse_ast(ctx, ast)
             llvm = finalize_llvm(ctx)
+            if os.path.exists(f_build(f"{key}.ll")):
+                with open(f_build(f"{key}.ll")) as f:
+                    old_llvm = f.read()
+                    if hash(old_llvm) == hash(llvm):
+                        eq(1, 1, "skipped as hash is the same")
+                        continue
             build_res = build_exe_from_llvm(llvm=llvm, output_filename=f_build(f"{key}.exe"))
             eq(build_res.returncode, 0, f"build_res: {run_to_s(build_res)}")
             run_res = run_executive(path=f_build(f"{key}.exe"))

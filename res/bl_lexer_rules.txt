@@ -1,4 +1,4 @@
-start: function+
+start: importc* function+
 ?expr: log
 
 ?log: cond
@@ -32,18 +32,21 @@ boolean: "true" -> true
      | boolean          -> boolean
      | "(" sum ")"
      | system_call
+     | macro_call
      | function_call
 
 params: (expr ("," expr )*)?
+
 function_call: NAME "(" params ")"
 
 system_call: "@" NAME "(" params ")"
 
+macro_call: "#" NAME "(" params ")"
+
+
 type: "int" -> i32
     | "bool" -> i8
     | "float" -> f32
-dec_param: type NAME
-dec_params: (dec_param ("," dec_param )*)?
 end: "}"
 body: "{" statement* end
 return_void: "return"
@@ -60,8 +63,17 @@ while: "while" expr _block
 
 ?return_type: type
             | "void" -> void
+dec_param: type NAME
+dec_params: (dec_param ("," dec_param )*)?
 
 function: "func" NAME "(" dec_params ")" "->" return_type _block
+
+macro_params: (NAME ("," NAME )*)?
+macro: "func" NAME "(" macro_params ")" _block
+
+importc_params: (type ("," type )*)?
+importc: "importc" NAME "(" importc_params ")" "->" return_type
+
 
 
 COMMENT: /\/\/.*/

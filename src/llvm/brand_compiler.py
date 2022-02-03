@@ -57,8 +57,6 @@ def clean(path: str = None, suffixes: list[str] = None) -> None:
 def finalize_llvm(ctx: Context) -> str:
     header = """target triple = "x86_64-pc-windows-msvc19.31.30818"
 
-declare i32 @putchar(i32)
-
 @0 = private unnamed_addr constant [3 x i8] c"%d\00", align 1
 declare i32 @printf(i8*, ...)
 

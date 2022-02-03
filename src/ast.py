@@ -12,7 +12,7 @@ def transform(tree):
         if type(child) == Tree:
             transform(child)
             children = child.children
-            if child.data in ("params", "dec_params"):
+            if child.data in ("params", "dec_params", "macro_params", "importc_params"):
                 tree.children[i] = (child.data, children)
                 continue
             if len(children) == 1:

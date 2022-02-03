@@ -3,11 +3,20 @@ from llvm.control_flow_instructions import *
 from llvm.struct import LLVM, FunctionSignature
 
 
+def parse_importc(ctx: Context, data) -> None:
+    name, params, return_type = data
+    ctx.signatures[name] = FunctionSignature(params[1], return_type)
+    params = ",".join(params[1])
+    ctx.listing.append(f"declare {return_type} @{name}({params})")
+
+
 def parse_ast(ctx: Context, ast) -> None:
     for f in ast:
         tag, data = f
         if tag == "function":
             parse_function(ctx, data)
+        elif tag == "importc":
+            parse_importc(ctx, data)
         else:
             assert 0, f"Unhandled tag {tag}"
 
