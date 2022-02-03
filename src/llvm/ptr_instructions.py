@@ -19,11 +19,13 @@ def reference_ptr_to_top_of_the_stack_experimental(ctx: Context, ptr_name: str) 
     ctx.listing.append(f"store i32* {top_of_the_stack}, i32** %{ptr_name}")
 
 
-def assign_ptr(ctx: Context) -> None:
+
+
+def assign_ptr(ctx: Context, el_type: LLVM.type) -> None:
     # register_counter = load_ptr(ctx, ptr_name)
     assigned_value = ctx.parameters.pop()
     ptr_name = ctx.parameters.pop()
-    ctx.listing.append(f"store i32 {assigned_value}, i32* {ptr_name}")
+    ctx.listing.append(f"store {el_type} {assigned_value}, {el_type}* {ptr_name}")
 
 
 def deref_ptr_and_push(ctx: Context) -> None:
@@ -35,7 +37,7 @@ def deref_ptr_and_push(ctx: Context) -> None:
     ctx.parameters.append(f"%{register_counter}")
 
 
-def shift(ctx: Context) -> None:
+def shift(ctx: Context, el_type: LLVM.type) -> None:
     # %5 = load i32*, i32** %3 ;, align 8           ;*ptr
     # %6 = getelementptr inbounds i32, i32* %5, i32 1
     # ;ptr+1
@@ -44,7 +46,7 @@ def shift(ctx: Context) -> None:
     indent_value = ctx.parameters.pop()
     ptr_name = ctx.parameters.pop()
     ctx.listing.append(
-        f"%{register_counter} = getelementptr inbounds i32, i32* {ptr_name}, i32 {indent_value}")
+        f"%{register_counter} = getelementptr inbounds {el_type}, {el_type}* {ptr_name}, i32 {indent_value}")
     ctx.parameters.append(f"%{register_counter}")
 
 

@@ -1,6 +1,6 @@
 from llvm.basic_instructions import *  # push_number
 from llvm.control_flow_instructions import *
-from llvm.struct import LLVM, FunctionSignature, VAR, GENERIC_TYPE, NUMBER
+from llvm.struct import LLVM, FunctionSignature, VAR, GENERIC_TYPE, NUMBER, LITERAL
 from src.llvm.ptr_instructions import deref_ptr_and_push, shift, assign_ptr, create_array_and_push
 
 
@@ -105,6 +105,22 @@ def infer_type(_ctx: Context, tag: str, type_0: LLVM.type, type_1: LLVM.type) ->
 
 def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
     _, params_data = params
+    if function_name == "printf":
+        ptr = params_data[0]
+        if len(params_data) == 1:
+            other = []
+        else:
+            other = params_data[1:]
+        ptr_type = parse_expr(ctx, ptr)
+        assert ptr_type == LLVM.ptr_byte
+        ptr_itself = llvm_pop(ctx)
+        rest = []
+        for param in other:
+            expr_type = parse_expr(ctx, param)
+            assert expr_type == LLVM.int
+            rest.append(llvm_pop(ctx))
+        ctx.listing.append(f"%{add_register(ctx)} = call i32 (i8*, ...) @printf(i8* {ptr_itself})")
+        return LLVM.void
     if function_name == "putd":
         assert len(params_data) == 1
         expr_type = parse_expr(ctx, params_data[0])
@@ -117,7 +133,7 @@ def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
         ptr_type = parse_expr(ctx, ptr_expression)
         ident_type = parse_expr(ctx, ident_value)
         assert is_pointer(ptr_type) and ident_type == LLVM.int
-        shift(ctx)
+        shift(ctx, ptr_type[:-1])
         return ptr_type
     if function_name == "deref":
         assert len(params_data) == 1
@@ -140,8 +156,23 @@ def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
         ptr_type = parse_expr(ctx, ptr_expression)
         assign_type = parse_expr(ctx, assign_value)
         assert is_pointer(ptr_type) and assign_type == ptr_type[:-1], (ptr_type, assign_type)
-        assign_ptr(ctx)
+        assign_ptr(ctx, ptr_type[:-1])
         return LLVM.void
+    if function_name == "array_from_lit":
+        assert len(params_data) == 1 and params_data[0][0] == LITERAL, params_data
+        params_data = params_data[0][1][1:-1]
+        create_array_and_push(ctx, LLVM.byte, len(params_data) + 1)  # ptr ptr + 1
+        llvm_duplicate(ctx)
+        for param in params_data:
+            llvm_duplicate(ctx)
+            llvm_push_number(ctx, ord(param))
+            assign_ptr(ctx, LLVM.byte)
+            llvm_push_number(ctx, 1)
+            shift(ctx, LLVM.byte)
+        llvm_push_number(ctx, 0)
+        assign_ptr(ctx, LLVM.byte)
+        # llvm_pop(ctx)
+        return LLVM.ptr_byte
     if function_name == "array_from":
         create_array_and_push(ctx, LLVM.int, len(params_data))  # ptr ptr + 1
         llvm_duplicate(ctx)
@@ -153,9 +184,9 @@ def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
             assert tag == NUMBER, param
             llvm_duplicate(ctx)
             llvm_push_number(ctx, data)
-            assign_ptr(ctx)
+            assign_ptr(ctx, LLVM.i32)
             llvm_push_number(ctx, 1)
-            shift(ctx)
+            shift(ctx, LLVM.i32)
         llvm_pop(ctx)
         return LLVM.ptr_int
     if function_name == "array":
@@ -210,7 +241,7 @@ def parse_expr(ctx: Context, data) -> LLVM.type:
         assert len(signature.parameters) == len(params_data)
         for i, param in enumerate(params_data):
             expr_type = parse_expr(ctx, param)
-            assert expr_type == signature.parameters[i]
+            assert expr_type == signature.parameters[i], (expr_type, signature.parameters[i])
         llvm_call_function(ctx, function_name)
         return ctx.signatures[function_name].return_type
     if tag == "unary_minus":  # temp
@@ -232,7 +263,7 @@ def parse_declare_variable(ctx: Context, data):
     ctx.variables[name] = typeof
     llvm_declare(ctx, name, typeof)
     expr_type = parse_expr(ctx, expr)
-    assert expr_type == typeof, (expr_type, typeof, name)
+    # assert expr_type == typeof, (expr_type, typeof, name)
     llvm_assign(ctx, name, typeof)
     # typeof use
 

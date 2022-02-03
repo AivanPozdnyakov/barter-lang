@@ -38,11 +38,20 @@ class LlvmClass:
     def ptr_bool(self):
         return "i8*"
 
+    @property
+    def byte(self):
+        return "i8"
+
+    @property
+    def ptr_byte(self):
+        return self.ptr_bool
+
 
 LLVM = LlvmClass()
 
 NUMBER = 'number'
 VAR = 'var'
+LITERAL = 'literal'
 GENERIC_TYPE = 'generic_type'
 CONST_EXPR = Literal[NUMBER, VAR]
 

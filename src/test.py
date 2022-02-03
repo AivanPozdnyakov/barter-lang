@@ -7,13 +7,13 @@ from barter_test import eq, run_all_tests, scope, echo
 from src.ast import build_ast_from_file
 from src.llvm.brand_compiler import build_exe_from_llvm, run_executive, finalize_llvm, clean
 from src.llvm.help import f_build, f_res
-from src.llvm.struct import Context
+from src.llvm.struct import Context, FunctionSignature, LLVM
 from src.llvm_backend import parse_ast
 
 
 def build_ctx() -> Context:
     # putchar_signature = FunctionSignature([LLVM.int], LLVM.void)
-    # signatures = {"putchar": putchar_signature}
+    # signatures = {"printf": FunctionSignature([LLVM.ptr_byte, LLVM.int], LLVM.int)}
     # signatures = {"putd": SysSignature([LLVM.int], LLVM.void), "addr": SysSignature(['VAR'], LLVM.ptrvoid)}
     ctx = Context()
     return ctx
@@ -60,6 +60,7 @@ test_cases = {
     "swap": "105",
     "bubble_sort": "14-2-3-123-5-40   -5 -4 -3 -2 -1 0 1 2 3 4".replace(" ", ""),
     "int_logical_operations": "1 0 0  1 1 0  0 1 1  1 0  0 1".replace(" ", ""),
+    "hello_world": "hello world",
 }
 
 

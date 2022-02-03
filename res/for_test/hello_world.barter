@@ -1,0 +1,13 @@
+func main() -> int {
+    *byte ptr = @array_from_lit("hello world");
+    @printf(ptr);
+//    *byte ptr = @array(byte, 5);
+//    byte zero = 0;
+//    @as_p(@shift(ptr,4),zero);
+//    byte A = 65;
+//    @as_p(ptr, A);
+////    byte B = 66;
+////    @as_p(@shift(ptr,1), B);
+//    @printf(ptr);
+    return 0;
+}

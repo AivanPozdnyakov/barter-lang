@@ -40,7 +40,8 @@ params: (expr ("," expr )*)?
 function_call: NAME "(" params ")"
 
 generic_type: type
-?system_call_param: generic_type | expr
+literal: ESCAPED_STRING
+?system_call_param: generic_type | expr | literal
 system_call_params: (system_call_param ("," system_call_param )*)?
 system_call: "@" NAME "(" system_call_params ")"
 
@@ -48,9 +49,11 @@ macro_call: "#" NAME "(" params ")"
 
 type: "int" -> i32
     | "bool" -> i8
+    | "byte" -> i8
     | "float" -> f32
     | "*int" -> ptr_i32
     | "*bool" -> ptr_i8
+    | "*byte" -> ptr_i8
     | "*float" -> ptr_f32
 
 end: "}"
@@ -77,6 +80,7 @@ function: "func" NAME "(" dec_params ")" "->" return_type _block
 macro_params: (NAME ("," NAME )*)?
 macro: "func" NAME "(" macro_params ")" _block
 
+vargs: "," "..."
 importc_params: (type ("," type )*)?
 importc: "importc" NAME "(" importc_params ")" "->" return_type
 
@@ -88,6 +92,7 @@ COMMENT: /\/\/.*/
 %import common.WS_INLINE
 %import common.WORD  
 %import common.SIGNED_NUMBER
+ %import common.ESCAPED_STRING
 %import common.WS
 %ignore WS
 %ignore COMMENT
