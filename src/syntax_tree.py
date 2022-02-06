@@ -1,6 +1,7 @@
 from lark import Lark, Tree, Token
-from llvm.brand_compiler import finalize_llvm
-from llvm_backend import parse_function
+from src.llvm.brand_compiler import finalize_llvm
+from src.llvm.help import f_res
+from src.llvm_backend import parse_function
 
 
 def transform(tree):
@@ -24,10 +25,17 @@ def transform(tree):
 
 # "../res/examples/fib.barter"
 def build_ast_from_file(filename: str):
-    with open("../res/bl_lexer_rules.txt", "r") as f:
+    with open("bl_lexer_rules.txt", "r") as f:
         parser = Lark(f.read(), parser='lalr')
     with open(filename, "r") as f:
         ast = parser.parse(f.read())
+    transform(ast)
+    ast = ast.children
+    return ast
+
+def build_ast(rules: str, listing: str):
+    parser = Lark(rules, parser='lalr')
+    ast = parser.parse(listing)
     transform(ast)
     ast = ast.children
     return ast

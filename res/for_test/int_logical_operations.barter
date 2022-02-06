@@ -22,10 +22,31 @@ func main() -> int {
     putb(4>=3);
 
     putb(1==1);
-    putb(1==2);
+    putb(1==3);
 
     putb(1!=1);
-    putb(1!=2);
+    putb(1!=3);
+
+    int a = 1;
+    int b = 3;
+
+    putb(a<3);
+    putb(3<3);
+    putb(4<3);
+
+    putb(a<=3);
+    putb(3<=3);
+    putb(4<=3);
+
+    putb(a>=b);
+    putb(b>=b);
+    putb(4>=b);
+
+    putb(a==a);
+    putb(a==b);
+
+    putb(a!=a);
+    putb(a!=b);
     // 1 0 0  1 1 0  0 1 1  1 0  0 1
     return 0;
 }

@@ -11,7 +11,7 @@ start: importc* function+
     | cond ">" sum -> bt
     | cond ">=" sum -> be
     | cond "==" sum -> eq
-    | cond "!=" sum -> neq
+    | cond "!=" sum -> ne
 
 ?sum: product
     | sum "+" product   -> add

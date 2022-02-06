@@ -1,24 +1,58 @@
 # barter-lang
+## deps
+- rich
+- click
+- python 3.9 for typing
 
 ## TODO
-
+- can we check importc / import native in compile time? 
+  probably only with project?
+- sanitizers
 - return
     - add auto return in void
     - return in the middle of the function
     - enforce return, handle error if not returned
     -[X] fix return issue
     -[X] ret void
-  
-- ptr instructions
-- array_from not only int
-- all system functions can be macros eventually?
-- binaries for all types!
+- [X] ptr instructions
+- struct
+- std library
+  - open file, read/write
+- advent of code [1/n]
+- auto type
+- constexpr 
+- proper signatures/interface for system functions
+- refactoring
+- varadic args
+- generic functions
+- concepts?
+- raylib import
+- default arguments
+- named arguments
+- const? mut?
+- vector
+- string
+- rewrite compiler in barter
+- rewrite lexer in barter
+- barman (barter package manager)
+  - toml parser in barter
+- differentiate from byte and bool
+- add postfixes for type (like 18i , 18., 18f, 18b)
+- report errors normally 
+  - CompilationError
+  - SyntaxError
+  - RuntimeError
+- import native
+- array_from any type (currently only int)
+- all system functions can be syntax sugar or macros eventually?
+- binary operations for all types!
 - ptr to a pointer (multi_dimensional_arrays)
--[X] putd
-- system function with @
--[X] i32, bool, float
--[X] add unary -, !, bool binary operations
 - add bitcast
 - test basic instructions
 - run separate test only
-- why not compiling from cmd?
+-[X] eq, neq for bool
+-[X] putd
+-[X] system function with @
+-[X] i32, bool, float
+-[X] add unary -, !, bool binary operations
+-[X] cmd tool to link, build and run

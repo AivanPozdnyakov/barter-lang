@@ -24,12 +24,24 @@ def llvm_push_variable(ctx: Context, variable_name: str, variable_type: LLVM.typ
 def llvm_push_number(ctx: Context, number: int) -> None:
     ctx.parameters.append(str(number))
 
+def llvm_apply_eq_check(ctx: Context, operator: str, op_type: LLVM.type) -> None:
+    params = ctx.parameters[-2:]
+    assert len(params) == 2, (operator, ctx.parameters)  # probably never assert?
+    parameters_as_str = ",".join(params)
+    register_counter = add_register(ctx)
+    listing = f"%{register_counter} = icmp {operator} {op_type} {parameters_as_str}"
+    register_counter = add_register(ctx)
+    listing += f"\n%{register_counter} = zext i1 %{register_counter - 1} to i8"
+    ctx.listing.append(listing)
+    for _ in range(2):
+        llvm_pop(ctx)
+    ctx.parameters.append(f"%{register_counter}")
 
 def llvm_apply_binary_operation(ctx: Context, operation_type: str) -> None:
     arithmetic_operations = {"add": "add", "sub": "sub", "mul": "mul", "div": "sdiv", "rem": "srem"}
-    logical_operations = {"lt": "slt", "le": "sle", "bt": "sgt", "be": "sge", "eq": "eq", "neq": "ne"}
+    logical_operations = {"lt": "slt", "le": "sle", "bt": "sgt", "be": "sge"}
     params = ctx.parameters[-2:]
-    assert len(params) == 2, (operation_type, ctx.parameters)
+    assert len(params) == 2, (operation_type, ctx.parameters) # probably never assert?
     parameters_as_str = ",".join(params)
     register_counter = add_register(ctx)
     if operation_type in arithmetic_operations:

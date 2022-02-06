@@ -1,16 +1,60 @@
+func putb(bool f) -> void {
+    if f {
+        @putd(1);
+        return;
+    }
+    @putd(0);
+    return;
+}
+
 func main() -> int {
-    @putd(true and false);
-    @putd(false and true);
-    @putd(true and true);
-    @putd(false and false);
+    putb(true and false);
+    putb(false and true);
+    putb(true and true);
+    putb(false and false);
 
-    @putd(true or false);
-    @putd(false or true);
-    @putd(true or true);
-    @putd(false or false);
+    putb(true or false);
+    putb(false or true);
+    putb(true or true);
+    putb(false or false);
 
-    @putd(!true);
-    @putd(!false);
-    // 0 0 1 0  1 1 1 0  0 1
+    putb(!true);
+    putb(!false);
+
+    putb(true == true);
+    putb(false == true);
+    putb(false == true);
+    putb(false == false);
+
+    putb(true != true);
+    putb(false != true);
+    putb(false != true);
+    putb(false != false);
+
+    bool t = true;
+    bool f = false;
+    putb(t and f);
+    putb(f and t);
+    putb(t and t);
+    putb(f and f);
+
+    putb(t or f);
+    putb(f or t);
+    putb(t or t);
+    putb(f or f);
+
+    putb(!t);
+    putb(!f);
+
+    putb(t == t);
+    putb(f == t);
+    putb(f == t);
+    putb(f == f);
+
+    putb(t != t);
+    putb(f != t);
+    putb(f != t);
+    putb(f != f);
+    // 0 0 1 0  1 1 1 0  0 1  1 0 0 1   0 1 1 0
     return 0;
 }

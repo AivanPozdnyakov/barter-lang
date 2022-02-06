@@ -1,6 +1,6 @@
-from llvm.basic_instructions import *  # push_number
-from llvm.control_flow_instructions import *
-from llvm.struct import LLVM, FunctionSignature, VAR, GENERIC_TYPE, NUMBER, LITERAL
+from src.llvm.basic_instructions import *  # push_number
+from src.llvm.control_flow_instructions import *
+from src.llvm.struct import LLVM, FunctionSignature, VAR, GENERIC_TYPE, NUMBER, LITERAL
 from src.llvm.ptr_instructions import deref_ptr_and_push, shift, assign_ptr, create_array_and_push
 
 
@@ -88,19 +88,12 @@ def parse_return(ctx: Context, data):
 
 
 def infer_type(_ctx: Context, tag: str, type_0: LLVM.type, type_1: LLVM.type) -> LLVM.type:
-    number_type = {LLVM.int, LLVM.float}
-    # if tag == "div":
-    #     assert type_0 in number_type and type_1 in number_type
-    #     return LLVM.float
     if tag in ("sub", "add", "mul", "div", "rem"):
         assert type_0 == type_1 == LLVM.int
         return LLVM.int
-    if tag in ("lt", "le", "bt", "be", "eq", "neq"):
+    if tag in ("lt", "le", "bt", "be"):
         assert type_0 == LLVM.int and type_1 == LLVM.int
         return LLVM.bool
-    # if tag in ("sub", "add", "mul"):
-    #     assert type_0 in number_type and type_1 in number_type
-    #     return LLVM.float if LLVM.float in (type_0, type_1) else LLVM.int
 
 
 def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
@@ -147,9 +140,6 @@ def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
         assert tag == VAR, (tag, data)
         ctx.parameters.append(f"%{data}")
         return ctx.variables[data] + "*"
-        # assert 0
-        # expr_type = parse_expr(ctx, params_data[0])
-        # assert expr_type == LLVM.int  # or expr_type == LLVM.bool
     if function_name == "as_p":
         assert len(params_data) == 2
         ptr_expression, assign_value = params_data
@@ -171,7 +161,6 @@ def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
             shift(ctx, LLVM.byte)
         llvm_push_number(ctx, 0)
         assign_ptr(ctx, LLVM.byte)
-        # llvm_pop(ctx)
         return LLVM.ptr_byte
     if function_name == "array_from":
         create_array_and_push(ctx, LLVM.int, len(params_data))  # ptr ptr + 1
@@ -184,9 +173,9 @@ def llvm_system_call(ctx: Context, function_name, params) -> LLVM.type:
             assert tag == NUMBER, param
             llvm_duplicate(ctx)
             llvm_push_number(ctx, data)
-            assign_ptr(ctx, LLVM.i32)
+            assign_ptr(ctx, LLVM.int)
             llvm_push_number(ctx, 1)
-            shift(ctx, LLVM.i32)
+            shift(ctx, LLVM.int)
         llvm_pop(ctx)
         return LLVM.ptr_int
     if function_name == "array":
@@ -220,18 +209,23 @@ def parse_expr(ctx: Context, data) -> LLVM.type:
         ctx.listing.append(f"%{reg + 1} = trunc i8 {ctx.parameters.pop()} to i1")
         ctx.listing.append(f"%{reg + 2} = trunc i8 {ctx.parameters.pop()} to i1")
         # % 3 = and i1 % first, % second
-        ctx.listing.append(f"%{reg + 3} = {tag} i1 %{reg + 1}, {reg + 2}")
+        ctx.listing.append(f"%{reg + 3} = {tag} i1 %{reg + 1}, %{reg + 2}")
         ctx.listing.append(f"%{reg + 4} = zext i1 %{reg + 3} to i8")
-        add_register(ctx, 4)
-        ctx.parameters.append(ctx.register_counter)
+        ctx.parameters.append(f"%{add_register(ctx, 4)}")
         return LLVM.bool
     if tag in ("sub", "add", "mul", "div", "rem",
-               "lt", "le", "bt", "be", "eq", "neq"):
+               "lt", "le", "bt", "be"):
         type_0 = parse_expr(ctx, data[0])
         type_1 = parse_expr(ctx, data[1])
         result_type = infer_type(ctx, tag, type_0, type_1)
         llvm_apply_binary_operation(ctx, tag)
         return result_type
+    if tag in ("eq", "ne"):
+        type_0 = parse_expr(ctx, data[0])
+        type_1 = parse_expr(ctx, data[1])
+        assert type_0 == type_1
+        llvm_apply_eq_check(ctx, tag, type_0)
+        return LLVM.bool
     if tag == "function_call":
         function_name, params = data
         _, params_data = params
