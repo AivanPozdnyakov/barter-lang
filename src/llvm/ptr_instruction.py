@@ -5,7 +5,7 @@ from src.llvm.help import *
 #     check_variable_doesnt_exist(ctx, ptr_name)
 #     ctx.variables.add(ptr_name)
 #     ctx.listing.append(f"%{ptr_name} = alloca i32*")
-from src.llvm.struct import LLVM
+from src.llvm.data_structures import LLVM
 
 
 def reference_ptr(ctx: Context, ptr_name: str, variable_name: str) -> None:

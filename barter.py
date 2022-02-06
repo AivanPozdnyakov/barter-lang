@@ -6,11 +6,11 @@ import click
 
 from src.llvm.brand_compiler import finalize_llvm
 from src.llvm.help import build_ctx, Timeit
-from src.llvm_backend import parse_ast
+from src.communication_layer import parse_ast
 from src.syntax_tree import build_ast_from_file, build_ast
 
 
-@click.command()
+# @click.command()
 @click.option("--clean", "-c", is_flag=True)
 @click.option("--build", "-b", is_flag=True)
 @click.option("--timeit", "-t", is_flag=True)
@@ -21,18 +21,20 @@ from src.syntax_tree import build_ast_from_file, build_ast
 @click.argument("deps", nargs=-1, type=click.Path(exists=True))
 def main(
     file_path: str,
-    clean: bool,
-    build: bool,
-    llvm_only: bool,
-    optimize: int,
-    output: str,
-    deps: list[str],
-    timeit: bool,
+    clean: bool = False,
+    build: bool = False,
+    llvm_only: bool = False,
+    optimize: int = 0,
+    output: str = None,
+    deps: list[str] = None,
+    timeit: bool = False,
 ):
     assert not llvm_only, "this option is not yet supported"
     assert not (clean and build), "`clean` and `build` options are mutually exclusive"
     assert 0 <= optimize <= 3, "optimize level must be between 0 and 3 inclusive"
     assert output is None or output.endswith(".exe")
+    if deps is None:
+        deps = []
     if output is not None:
         output_directory_path = os.path.dirname(output)
         llvm_filename = os.path.basename(output).replace('.exe', '.ll')
@@ -73,4 +75,4 @@ if __name__ == "__main__":
     # print("script path directory", os.path.dirname(os.path.realpath(__file__)))
     # print("rules path", os.path.join(os.path.dirname(os.path.realpath(__file__)), "bl_lexer_rules.txt"))
     # print("script name", os.path.basename(os.path.realpath(__file__)))
-    main()
+    main("res/for_test/struct.barter")

@@ -1,7 +1,4 @@
 from lark import Lark, Tree, Token
-from src.llvm.brand_compiler import finalize_llvm
-from src.llvm.help import f_res
-from src.llvm_backend import parse_function
 
 
 def transform(tree):
@@ -13,7 +10,7 @@ def transform(tree):
         if type(child) == Tree:
             transform(child)
             children = child.children
-            if child.data in ("params", "dec_params", "macro_params", "importc_params", "system_call_params"):
+            if child.data in ("params", "dec_params", "macro_params", "importc_params", "system_call_params", "struct_params"):
                 tree.children[i] = (child.data, children)
                 continue
             if len(children) == 1:
@@ -39,11 +36,3 @@ def build_ast(rules: str, listing: str):
     transform(ast)
     ast = ast.children
     return ast
-
-    # for f in ast:
-    #     tag, data = f
-    #     if tag == "function":
-    #         parse_function(data)
-    #     else:
-    #         assert 0, f"Unhandled tag {tag}"
-    # print(generate_llvm(ctx))

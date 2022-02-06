@@ -5,6 +5,7 @@
 - python 3.9 for typing
 
 ## TODO
+- forward declaration
 - can we check importc / import native in compile time? 
   probably only with project?
 - sanitizers
@@ -48,8 +49,9 @@
 - binary operations for all types!
 - ptr to a pointer (multi_dimensional_arrays)
 - add bitcast
-- test basic instructions
-- run separate test only
+- test basic instructions?
+- run separate test only?
+- use plain pytest maybe?
 -[X] eq, neq for bool
 -[X] putd
 -[X] system function with @

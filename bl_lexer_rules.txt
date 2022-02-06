@@ -1,4 +1,4 @@
-start: importc* function+
+start: importc* struct* function+
 ?expr: log
 
 ?log: cond
@@ -47,14 +47,12 @@ system_call: "@" NAME "(" system_call_params ")"
 
 macro_call: "#" NAME "(" params ")"
 
-type: "int" -> i32
-    | "bool" -> i8
-    | "byte" -> i8
-    | "float" -> f32
-    | "*int" -> ptr_i32
-    | "*bool" -> ptr_i8
-    | "*byte" -> ptr_i8
-    | "*float" -> ptr_f32
+type: "int" -> bint
+    | "bool" -> bbool
+    | "byte" -> bbyte
+    | "float" -> bfloat
+    | NAME
+    | (type "*")
 
 end: "}"
 body: "{" statement* end
@@ -80,9 +78,12 @@ function: "func" NAME "(" dec_params ")" "->" return_type _block
 macro_params: (NAME ("," NAME )*)?
 macro: "func" NAME "(" macro_params ")" _block
 
-vargs: "," "..."
 importc_params: (type ("," type )*)?
 importc: "importc" NAME "(" importc_params ")" "->" return_type
+
+struct_param: type NAME
+struct_params: struct_param ("," struct_param )*
+struct: "struct" NAME "{" struct_params "}"
 
 
 
@@ -92,7 +93,7 @@ COMMENT: /\/\/.*/
 %import common.WS_INLINE
 %import common.WORD  
 %import common.SIGNED_NUMBER
- %import common.ESCAPED_STRING
+%import common.ESCAPED_STRING
 %import common.WS
 %ignore WS
 %ignore COMMENT

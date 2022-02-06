@@ -3,7 +3,7 @@ import uuid
 
 import rich
 
-from src.llvm.struct import Context
+from src.llvm.data_structures import Context
 
 
 def is_pointer(s: str) -> bool:
@@ -16,7 +16,8 @@ specials = {"return", "if", "while", "macro", "func", "for", "else", "elseif", "
 
 
 def check_variable_doesnt_exist(ctx: Context, variable_name: str):
-    assert variable_name not in ctx.variables and variable_name not in specials, variable_name
+    assert variable_name not in ctx.variables and variable_name not in specials and variable_name not in ctx.structs, \
+        variable_name
 
 
 def check_variable_exists(ctx: Context, variable_name: str):
@@ -47,6 +48,7 @@ def f_res(path: str) -> str:
 def f_build(path: str) -> str:
     return "build/" + path
 
+
 class Timeit:
     def __init__(self, message, silent=False):
         self.message = message
@@ -60,4 +62,4 @@ class Timeit:
     def __exit__(self, typeof, value, traceback):
         self.elapsed = time.time() - self.elapsed
         if not self.silent:
-                rich.print(f"[cyan]{self.message} {self.elapsed}[/cyan]")
+            rich.print(f"[cyan]{self.message} {self.elapsed}[/cyan]")

@@ -1,14 +1,17 @@
-from src.llvm.basic_instructions import llvm_declare, llvm_assign, neg
-from src.llvm.help import *
+from src.data_structure import Context
+from src.help import add_register
+from src.llvm.basic_instruction import llvm_assign
+
 
 def llvm_ret_void(ctx: Context) -> None:
     ctx.return_index.append(len(ctx.listing))
     ctx.listing.append(f"br label TMP")
-    # add_register(ctx)
+
 
 def llvm_ret(ctx: Context) -> None:
     llvm_assign(ctx, "return", ctx.current_return_type)
     llvm_ret_void(ctx)
+
 
 def llvm_branch(ctx: Context) -> None:
     parameters = ctx.parameters
@@ -24,8 +27,10 @@ br i1 %{register_counter}, label %{register_counter + 1}, label TMP
     ctx.branch_temp_indexes.append(len(ctx.listing))
     ctx.listing.append(listing)
 
+
 def is_branch(s: str) -> bool:
     return s.startswith("br label")
+
 
 def llvm_branch_end(ctx: Context) -> None:
     label = add_register(ctx)

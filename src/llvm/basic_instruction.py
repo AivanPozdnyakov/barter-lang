@@ -1,20 +1,22 @@
-from src.llvm.help import *
-from src.llvm.struct import LLVM
+from src.help import add_register
+from src.data_structure import Context, LLVM_Type, is_llvm_type
 
 
-def llvm_declare(ctx: Context, variable_name: str, variable_type: LLVM.type) -> None:
+def llvm_declare(ctx: Context, variable_name: str, variable_type: LLVM_Type) -> None:
+    assert is_llvm_type(ctx, variable_type)
     ctx.listing.append(f"%{variable_name} = alloca {variable_type}")
     # ctx.listing.append(f"%{variable_name} = alloca i32")
 
 
-def llvm_assign(ctx: Context, variable_name: str, variable_type: LLVM.type) -> None:
+def llvm_assign(ctx: Context, variable_name: str, variable_type: LLVM_Type) -> None:
+    assert is_llvm_type(ctx, variable_type)
     assigned_value = ctx.parameters.pop()
-    # listing = f"store i32 {assigned_value}, i32* %{variable_name}"
     listing = f"store {variable_type} {assigned_value}, {variable_type}* %{variable_name}"
     ctx.listing.append(listing)
 
 
-def llvm_push_variable(ctx: Context, variable_name: str, variable_type: LLVM.type) -> None:
+def llvm_push_variable(ctx: Context, variable_name: str, variable_type: LLVM_Type) -> None:
+    assert is_llvm_type(ctx, variable_type)
     register_counter = add_register(ctx)
     ctx.listing.append(f"%{register_counter} = load {variable_type}, {variable_type}* %{variable_name}")
     # ctx.listing.append(f"%{register_counter} = load i32, i32* %{variable_name}")
@@ -24,7 +26,8 @@ def llvm_push_variable(ctx: Context, variable_name: str, variable_type: LLVM.typ
 def llvm_push_number(ctx: Context, number: int) -> None:
     ctx.parameters.append(str(number))
 
-def llvm_apply_eq_check(ctx: Context, operator: str, op_type: LLVM.type) -> None:
+def llvm_apply_eq_check(ctx: Context, operator: str, op_type: LLVM_Type) -> None:
+    assert is_llvm_type(ctx, op_type)
     params = ctx.parameters[-2:]
     assert len(params) == 2, (operator, ctx.parameters)  # probably never assert?
     parameters_as_str = ",".join(params)
